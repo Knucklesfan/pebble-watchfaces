@@ -1,0 +1,123 @@
+{
+  "name": "itsasony",
+  "author": "Knfn",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "It's a Sony",
+    "uuid": "dc0415d9-b355-489a-89d2-b1ad5eb6479a",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "TEMPERATURE",
+      "CONDITIONS",
+      "CONDINT",
+      "REQUEST_WEATHER"
+    ],
+    "resources": {
+      "media": [
+        {
+        "type": "bitmap",
+        "name": "BACKDROP",
+        "file": "backdrop.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "0",
+          "file": "0.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "1",
+          "file": "1.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "2",
+          "file": "2.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "3",
+          "file": "3.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "4",
+          "file": "4.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "5",
+          "file": "5.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "6",
+          "file": "6.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "7",
+          "file": "7.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "8",
+          "file": "8.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "9",
+          "file": "9.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "M",
+          "file": "m.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "A",
+          "file": "a.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "P",
+          "file": "p.png"
+        },
+        { "type": "bitmap", "name": "BATT_5", "file": "batt_5.png" },
+        { "type": "bitmap", "name": "BATT_15", "file": "batt_15.png" },
+        { "type": "bitmap", "name": "BATT_25", "file": "batt_25.png" },
+        { "type": "bitmap", "name": "BATT_40", "file": "batt_40.png" },
+        { "type": "bitmap", "name": "BATT_50", "file": "batt_50.png" },
+        { "type": "bitmap", "name": "BATT_75", "file": "batt_75.png" },
+        { "type": "bitmap", "name": "BATT_90", "file": "batt_90.png" },
+        { "type": "bitmap", "name": "BATT_FULL", "file": "batt_full.png" },
+        { "type": "bitmap", "name": "BATT_NONE", "file": "batt_none.png" },
+        { "type": "bitmap", "name": "BATT_CHARGE", "file": "batt_charge.png" },
+        { "type": "bitmap", "name": "CLOUDY", "file": "cloudy.png" },
+        { "type": "bitmap", "name": "LIGHTNING", "file": "lightning.png" },
+        { "type": "bitmap", "name": "PARTYCLOUD", "file": "partycloud.png" },
+        { "type": "bitmap", "name": "RAIN", "file": "rain.png" },
+        { "type": "bitmap", "name": "SNOW", "file": "snow.png" },
+        { "type": "bitmap", "name": "SUN", "file": "sun.png" }
+      ]
+    },
+    "capabilities": [ "health", "location" ]
+  }
+}
