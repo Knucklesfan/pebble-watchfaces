@@ -16,6 +16,7 @@ static BitmapLayer* s_letter_layer[RENDERLETTERS];
 static TextLayer *s_batt_text_layer;
 static TextLayer *s_step_layer;
 static TextLayer *s_weather_text_layer;
+static TextLayer *s_date_layer;
 
 const int weather_codes[WEATHERLEN] = {
   RESOURCE_ID_SUN,
@@ -149,7 +150,11 @@ static void update_time() {
   struct tm *tick_time = localtime(&temp);
 
   // Write the current hours and minutes into a buffer
-  
+  static char s_date_buffer[32];
+  strftime(s_date_buffer, sizeof(s_date_buffer), "%a %b %d %Y", tick_time);
+
+  // Display the date
+  text_layer_set_text(s_date_layer, s_date_buffer);
   int subhour = (clock_is_24h_style()&&tick_time->tm_hour>12)*12;
   if(((tick_time->tm_hour-subhour)/10)%10) {
       layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[0]), false);
@@ -234,6 +239,15 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_weather_text_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_text_layer));
   text_layer_set_text(s_weather_text_layer, "Loading...");
+
+  s_date_layer = text_layer_create(
+  GRect(16, 228-14-9, 9*16, 16)); 
+  text_layer_set_background_color(s_date_layer, GColorClear);
+  text_layer_set_text_color(s_date_layer, GColorOrange);
+  text_layer_set_font(s_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
+  text_layer_set_text_alignment(s_date_layer, GTextAlignmentLeft);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_date_layer));
+  text_layer_set_text(s_date_layer, "Mon Jan 01");
 
 }
 
