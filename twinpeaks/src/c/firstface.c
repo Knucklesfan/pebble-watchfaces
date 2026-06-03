@@ -7,12 +7,14 @@
 #define WEATHERLEN 6
 #define CTOF *1.8+32
 static Window *s_main_window;
-static GBitmap *s_bitmap_backdrop;
+static GBitmap *s_bitmap_day;
+static GBitmap *s_bitmap_night;
+
 static BitmapLayer *s_battery_layer;
 static BitmapLayer *s_weather_icon_layer;
-
+static bool day = true;
 static BitmapLayer *s_backdrop_layer;
-static BitmapLayer* s_letter_layer[RENDERLETTERS];
+static TextLayer *s_time_text_layer;
 static TextLayer *s_batt_text_layer;
 static TextLayer *s_step_layer;
 static TextLayer *s_weather_text_layer;
@@ -26,21 +28,6 @@ const int weather_codes[WEATHERLEN] = {
   RESOURCE_ID_LIGHTNING,
   RESOURCE_ID_SNOW
 };
-const int letter_codes[LETTERLEN] = {
-  RESOURCE_ID_0,
-  RESOURCE_ID_1,
-  RESOURCE_ID_2,
-  RESOURCE_ID_3,
-  RESOURCE_ID_4,
-  RESOURCE_ID_5,
-  RESOURCE_ID_6,
-  RESOURCE_ID_7,
-  RESOURCE_ID_8,
-  RESOURCE_ID_9,
-  RESOURCE_ID_P,
-  RESOURCE_ID_A,
-  RESOURCE_ID_M
-};
 const int batt_codes[BATTERYLEN] = {
   RESOURCE_ID_BATT_CHARGE,
   RESOURCE_ID_BATT_FULL,
@@ -52,16 +39,6 @@ const int batt_codes[BATTERYLEN] = {
     RESOURCE_ID_BATT_15,
     RESOURCE_ID_BATT_5
 };
-const GRect letterpos[RENDERLETTERS] = {
-  GRect(138, 78, 23, 23), //top left
-  GRect(138, 78+23+3, 23, 23), //upmid left
-  GRect(138, 78+46+6, 23, 23), //dwmid left
-  GRect(138, 78+69+9, 23, 23), //bottom left
-
-  GRect(166, 78+23+3, 23, 23), //dwmid left
-  GRect(166, 78+46+6, 23, 23), //bottom left
-};
-static GBitmap* s_bitmap_letters[LETTERLEN]; 
 static GBitmap* s_bitmap_battery[BATTERYLEN];
 static GBitmap* s_bitmap_weather[WEATHERLEN];
 static int s_steps = 0;
@@ -155,30 +132,50 @@ static void update_time() {
 
   // Display the date
   text_layer_set_text(s_date_layer, s_date_buffer);
-  int subhour = (!clock_is_24h_style()&&tick_time->tm_hour>12)*12;
-  if(((tick_time->tm_hour-subhour)/10)%10) {
-      layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[0]), false);
-      bitmap_layer_set_bitmap(s_letter_layer[0], s_bitmap_letters[((tick_time->tm_hour-subhour)/10)%10]);
+  static char s_time_buffer[8];
+  strftime(s_time_buffer, sizeof(s_time_buffer), "%I:%M", tick_time);
+  text_layer_set_text(s_time_text_layer, s_time_buffer);
+  if(tick_time->tm_hour > 19 || tick_time->tm_hour < 6) {
+    if(day) {
+      bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_night);
+      text_layer_set_text_color(s_time_text_layer, GColorWhite);
+      day = false;
+    }
   }
   else {
-      layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[0]), true);
+    if(!day) {
+      bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_day);
+      text_layer_set_text_color(s_time_text_layer, GColorBlack);
+
+      day = true;
+    }
 
   }
-  bitmap_layer_set_bitmap(s_letter_layer[1], s_bitmap_letters[(tick_time->tm_hour-subhour)%10]);
-  bitmap_layer_set_bitmap(s_letter_layer[2], s_bitmap_letters[(tick_time->tm_min/10)%10]);
-  bitmap_layer_set_bitmap(s_letter_layer[3], s_bitmap_letters[(tick_time->tm_min)%10]);
-  if(!clock_is_24h_style()) {
-      layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[4]), false);
-      layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[5]), false);
+  int subhour = tick_time->tm_hour;
 
-      bitmap_layer_set_bitmap(s_letter_layer[4], subhour?s_bitmap_letters[10]:s_bitmap_letters[11]);
-      bitmap_layer_set_bitmap(s_letter_layer[5], s_bitmap_letters[12]);
-  }
-  else {
-    layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[4]), true);
-    layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[5]), true);
+  // if(((tick_time->tm_hour-subhour)/10)%10) {
+  //     layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[0]), false);
+  //     bitmap_layer_set_bitmap(s_letter_layer[0], s_bitmap_letters[((tick_time->tm_hour-subhour)/10)%10]);
+  // }
+  // else {
+  //     layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[0]), true);
 
-  }
+  // }
+  // bitmap_layer_set_bitmap(s_letter_layer[1], s_bitmap_letters[(tick_time->tm_hour-subhour)%10]);
+  // bitmap_layer_set_bitmap(s_letter_layer[2], s_bitmap_letters[(tick_time->tm_min/10)%10]);
+  // bitmap_layer_set_bitmap(s_letter_layer[3], s_bitmap_letters[(tick_time->tm_min)%10]);
+  // if(!clock_is_24h_style()) {
+  //     layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[4]), false);
+  //     layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[5]), false);
+
+  //     bitmap_layer_set_bitmap(s_letter_layer[4], subhour?s_bitmap_letters[10]:s_bitmap_letters[11]);
+  //     bitmap_layer_set_bitmap(s_letter_layer[5], s_bitmap_letters[12]);
+  // }
+  // else {
+  //   layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[4]), true);
+  //   layer_set_hidden(bitmap_layer_get_layer(s_letter_layer[5]), true);
+
+  // }
 }
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
@@ -190,65 +187,74 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 static void main_window_load(Window *window) {
   s_backdrop_layer = bitmap_layer_create(GRect(0, 0, 200, 228));
   bitmap_layer_set_compositing_mode(s_backdrop_layer, GCompOpSet);
-  bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_backdrop);
+  bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_day);
   // Show the Window on the watch, with animated=true
   layer_add_child(window_get_root_layer(window), 
                                       bitmap_layer_get_layer(s_backdrop_layer));
-  for(int i = 0; i < RENDERLETTERS; i++) {
-    s_letter_layer[i] = bitmap_layer_create(letterpos[i]);
-    bitmap_layer_set_compositing_mode(s_letter_layer[i], GCompOpSet);
-    bitmap_layer_set_bitmap(s_letter_layer[i], s_bitmap_letters[0]);
-    layer_add_child(window_get_root_layer(window), 
-    bitmap_layer_get_layer(s_letter_layer[i]));
+  // for(int i = 0; i < RENDERLETTERS; i++) {
+  //   s_letter_layer[i] = bitmap_layer_create(letterpos[i]);
+  //   bitmap_layer_set_compositing_mode(s_letter_layer[i], GCompOpSet);
+  //   bitmap_layer_set_bitmap(s_letter_layer[i], s_bitmap_letters[0]);
+  //   layer_add_child(window_get_root_layer(window), 
+  //   bitmap_layer_get_layer(s_letter_layer[i]));
 
-  }
-  s_battery_layer = bitmap_layer_create(GRect(16,228-9-4,16,9));
+  // }
+  s_battery_layer = bitmap_layer_create(GRect(0,228-9-2,16,9));
   bitmap_layer_set_compositing_mode(s_battery_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_battery_layer, s_bitmap_battery[0]);
   layer_add_child(window_get_root_layer(window), 
   bitmap_layer_get_layer(s_battery_layer));
   s_batt_text_layer = text_layer_create(
-    GRect(32, 228-14, 9*4, 16)); 
+    GRect(16, 228-16, 9*4, 16)); 
   text_layer_set_background_color(s_batt_text_layer, GColorClear);
-  text_layer_set_text_color(s_batt_text_layer, GColorBlack);
-  text_layer_set_font(s_batt_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
+  text_layer_set_text_color(s_batt_text_layer, GColorWhite);
+  text_layer_set_font(s_batt_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
   text_layer_set_text_alignment(s_batt_text_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_batt_text_layer));
 
   //place steps at x=68
   s_step_layer = text_layer_create(
-  GRect(68, 228-14, 9*8, 16)); 
+  GRect(68, 228-16, 9*8, 16)); 
   text_layer_set_background_color(s_step_layer, GColorClear);
-  text_layer_set_text_color(s_step_layer, GColorBlack);
-  text_layer_set_font(s_step_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
+  text_layer_set_text_color(s_step_layer, GColorWhite);
+  text_layer_set_font(s_step_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
   text_layer_set_text_alignment(s_step_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_step_layer));
   text_layer_set_text(s_step_layer, "888888");
   // place weather at x=98+16
-  s_weather_icon_layer = bitmap_layer_create(GRect(98,228-9-4,16,9));
+  s_weather_icon_layer = bitmap_layer_create(GRect(98,228-9-2,16,9));
   bitmap_layer_set_compositing_mode(s_weather_icon_layer, GCompOpSet);
   bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[0]);
   layer_add_child(window_get_root_layer(window), 
   bitmap_layer_get_layer(s_weather_icon_layer));
 
   s_weather_text_layer = text_layer_create(
-  GRect(98+16, 228-14, 9*8, 16)); 
+  GRect(98+16, 228-16, 9*8, 16)); 
   text_layer_set_background_color(s_weather_text_layer, GColorClear);
   text_layer_set_text_color(s_weather_text_layer, GColorWhite);
-  text_layer_set_font(s_weather_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
+  text_layer_set_font(s_weather_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
   text_layer_set_text_alignment(s_weather_text_layer, GTextAlignmentLeft);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_weather_text_layer));
   text_layer_set_text(s_weather_text_layer, "Loading...");
 
   s_date_layer = text_layer_create(
-  GRect(16, 228-14-9, 9*16, 16)); 
+  GRect(0, 155+40, 200, 20)); 
   text_layer_set_background_color(s_date_layer, GColorClear);
-  text_layer_set_text_color(s_date_layer, GColorOrange);
-  text_layer_set_font(s_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_09));
-  text_layer_set_text_alignment(s_date_layer, GTextAlignmentLeft);
+  text_layer_set_text_color(s_date_layer, GColorWhite);
+  text_layer_set_font(s_date_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_date_layer));
   text_layer_set_text(s_date_layer, "Mon Jan 01");
+  s_time_text_layer = text_layer_create(
+    GRect(0, 32, 200, 48)); 
+  text_layer_set_background_color(s_time_text_layer, GColorClear);
+  text_layer_set_text_color(s_time_text_layer, GColorBlack);
+  text_layer_set_font(s_time_text_layer, fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49));
+  text_layer_set_text_alignment(s_time_text_layer, GTextAlignmentCenter);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_text_layer));
+  text_layer_set_text(s_time_text_layer, "5:00");
 
+  
 }
 
 static void main_window_unload(Window *window) {
@@ -301,12 +307,14 @@ static void init() {
     .load = main_window_load,
     .unload = main_window_unload
   });
-  s_bitmap_backdrop = gbitmap_create_with_resource(RESOURCE_ID_BACKDROP);
+  s_bitmap_day = gbitmap_create_with_resource(RESOURCE_ID_DAY);
+  s_bitmap_night = gbitmap_create_with_resource(RESOURCE_ID_NIGHT);
+
     //initialize backdrop
 
-  for(int i = 0; i < LETTERLEN; i++) {
-    s_bitmap_letters[i] = gbitmap_create_with_resource(letter_codes[i]);
-  }
+  // for(int i = 0; i < LETTERLEN; i++) {
+  //   s_bitmap_letters[i] = gbitmap_create_with_resource(letter_codes[i]);
+  // }
   for(int i = 0; i < BATTERYLEN; i++) {
     s_bitmap_battery[i] = gbitmap_create_with_resource(batt_codes[i]);
   }

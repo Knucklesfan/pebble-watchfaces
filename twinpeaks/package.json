@@ -1,0 +1,58 @@
+{
+  "name": "twinpeaks",
+  "author": "Knfn",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Welcome to Twin Peaks",
+    "uuid": "23b9e64b-4628-4be9-8f27-88fca17e63a5",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "TEMPERATURE",
+      "CONDITIONS",
+      "CONDINT",
+      "REQUEST_WEATHER"
+    ],
+    "resources": {
+      "media": [
+        {
+        "type": "bitmap",
+        "name": "DAY",
+        "file": "day.png"
+        },
+        {
+        "type": "bitmap",
+        "name": "NIGHT",
+        "file": "night.png"
+        },
+
+        { "type": "bitmap", "name": "BATT_5", "file": "batt_5.png" },
+        { "type": "bitmap", "name": "BATT_15", "file": "batt_15.png" },
+        { "type": "bitmap", "name": "BATT_25", "file": "batt_25.png" },
+        { "type": "bitmap", "name": "BATT_40", "file": "batt_40.png" },
+        { "type": "bitmap", "name": "BATT_50", "file": "batt_50.png" },
+        { "type": "bitmap", "name": "BATT_75", "file": "batt_75.png" },
+        { "type": "bitmap", "name": "BATT_90", "file": "batt_90.png" },
+        { "type": "bitmap", "name": "BATT_FULL", "file": "batt_full.png" },
+        { "type": "bitmap", "name": "BATT_NONE", "file": "batt_none.png" },
+        { "type": "bitmap", "name": "BATT_CHARGE", "file": "batt_charge.png" },
+        { "type": "bitmap", "name": "CLOUDY", "file": "cloudy.png" },
+        { "type": "bitmap", "name": "LIGHTNING", "file": "lightning.png" },
+        { "type": "bitmap", "name": "PARTYCLOUD", "file": "partycloud.png" },
+        { "type": "bitmap", "name": "RAIN", "file": "rain.png" },
+        { "type": "bitmap", "name": "SNOW", "file": "snow.png" },
+        { "type": "bitmap", "name": "SUN", "file": "sun.png" }
+      ]
+    },
+    "capabilities": [ "health", "location" ]
+  }
+}
