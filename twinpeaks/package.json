@@ -34,7 +34,12 @@
         "name": "NIGHT",
         "file": "night.png"
         },
-
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "icon.png",
+          "menuIcon": true
+        },
         { "type": "bitmap", "name": "BATT_5", "file": "batt_5.png" },
         { "type": "bitmap", "name": "BATT_15", "file": "batt_15.png" },
         { "type": "bitmap", "name": "BATT_25", "file": "batt_25.png" },

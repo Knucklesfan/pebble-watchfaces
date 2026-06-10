@@ -1,0 +1,463 @@
+{
+  "name": "mcclock",
+  "author": "MakeAwesomeHappen",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "@rebble/clay": "^1.0.10"
+  },
+  "pebble": {
+    "displayName": "Minecraft Clock",
+    "uuid": "f63c7937-7f7b-47fc-8c06-b80946166e7b",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "TEMPERATURE",
+      "CONDITIONS",
+      "CONDINT",
+      "REQUEST_WEATHER",
+      "SHOWCLOCK",
+      "SHOWDATE",
+      "SHOWSTEPS",
+      "SHOWWEATHER",
+      "SHOWBATTERY",
+      "TEMPCELSIUS"
+    ],
+    "capabilities": [
+      "health",
+      "location",
+      "configurable"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "CLOCK",
+          "file": "clock.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_0",
+          "file": "clock_0.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_1",
+          "file": "clock_1.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_2",
+          "file": "clock_2.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_3",
+          "file": "clock_3.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_4",
+          "file": "clock_4.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_5",
+          "file": "clock_5.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_6",
+          "file": "clock_6.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_7",
+          "file": "clock_7.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_8",
+          "file": "clock_8.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_9",
+          "file": "clock_9.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_10",
+          "file": "clock_10.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_11",
+          "file": "clock_11.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_12",
+          "file": "clock_12.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_13",
+          "file": "clock_13.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_14",
+          "file": "clock_14.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_15",
+          "file": "clock_15.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_16",
+          "file": "clock_16.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_17",
+          "file": "clock_17.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_18",
+          "file": "clock_18.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_19",
+          "file": "clock_19.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_20",
+          "file": "clock_20.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_21",
+          "file": "clock_21.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_22",
+          "file": "clock_22.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_23",
+          "file": "clock_23.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_24",
+          "file": "clock_24.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_25",
+          "file": "clock_25.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_26",
+          "file": "clock_26.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_27",
+          "file": "clock_27.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_28",
+          "file": "clock_28.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_29",
+          "file": "clock_29.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_30",
+          "file": "clock_30.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_31",
+          "file": "clock_31.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_32",
+          "file": "clock_32.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_33",
+          "file": "clock_33.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_34",
+          "file": "clock_34.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_35",
+          "file": "clock_35.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_36",
+          "file": "clock_36.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_37",
+          "file": "clock_37.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_38",
+          "file": "clock_38.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_39",
+          "file": "clock_39.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_40",
+          "file": "clock_40.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_41",
+          "file": "clock_41.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_42",
+          "file": "clock_42.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_43",
+          "file": "clock_43.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_44",
+          "file": "clock_44.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_45",
+          "file": "clock_45.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_46",
+          "file": "clock_46.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_47",
+          "file": "clock_47.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_48",
+          "file": "clock_48.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_49",
+          "file": "clock_49.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_50",
+          "file": "clock_50.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_51",
+          "file": "clock_51.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_52",
+          "file": "clock_52.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_53",
+          "file": "clock_53.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_54",
+          "file": "clock_54.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_55",
+          "file": "clock_55.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_56",
+          "file": "clock_56.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_57",
+          "file": "clock_57.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_58",
+          "file": "clock_58.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_59",
+          "file": "clock_59.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_60",
+          "file": "clock_60.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_61",
+          "file": "clock_61.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_62",
+          "file": "clock_62.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOCK_63",
+          "file": "clock_63.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "icon.png",
+          "menuIcon": true
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_5",
+          "file": "batt_5.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_15",
+          "file": "batt_15.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_25",
+          "file": "batt_25.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_40",
+          "file": "batt_40.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_50",
+          "file": "batt_50.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_75",
+          "file": "batt_75.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_90",
+          "file": "batt_90.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_FULL",
+          "file": "batt_full.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_NONE",
+          "file": "batt_none.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "BATT_CHARGE",
+          "file": "batt_charge.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "CLOUDY",
+          "file": "cloudy.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LIGHTNING",
+          "file": "lightning.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "PARTYCLOUD",
+          "file": "partycloud.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RAIN",
+          "file": "rain.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "SNOW",
+          "file": "snow.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "SUN",
+          "file": "sun.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "RUNFOOT",
+          "file": "runfoot.png"
+        }
+
+      ]
+    }
+  }
+}
