@@ -1,3 +1,7 @@
+var Clay = require('@rebble/clay');
+var clayConfig = require('./config');
+var clay = new Clay(clayConfig);
+
 //shameslessly stolen from the tutorial. hey, it works man
 // Helper function for XMLHttpRequest
 var xhrRequest = function (url, type, callback) {

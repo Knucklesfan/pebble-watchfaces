@@ -6,10 +6,34 @@
 #define RENDERLETTERS 6
 #define WEATHERLEN 6
 #define CTOF *1.8+32
+#define SETTINGS_KEY 1
+#define DEFAULT_DAY 1
+#define DEFAULT_NIGHT 0
+typedef struct ClaySettings {
+  bool Celsius; // false = Fahrenheit, true = Celsius
+  bool weatherScreens; // false = hidden, true = shown
+  int forceWeather; // -1 = disabled, 0>= enabled
+} ClaySettings;
+
+static ClaySettings settings;
+static void prv_default_settings() {
+  settings.Celsius = false;
+  settings.weatherScreens = false;
+  settings.forceWeather = -1;
+}
+static void prv_save_settings() {
+  persist_write_data(SETTINGS_KEY, &settings, sizeof(settings));
+}
+
+static void prv_load_settings() {
+  prv_default_settings();
+  persist_read_data(SETTINGS_KEY, &settings, sizeof(settings));
+}
+
+
 static Window *s_main_window;
 static GBitmap *s_bitmap_day;
-static GBitmap *s_bitmap_night;
-
+static int lastWeather = 0;
 static BitmapLayer *s_battery_layer;
 static BitmapLayer *s_weather_icon_layer;
 static bool day = true;
@@ -39,6 +63,23 @@ const int batt_codes[BATTERYLEN] = {
     RESOURCE_ID_BATT_15,
     RESOURCE_ID_BATT_5
 };
+const int day_codes[WEATHERLEN] = {
+  RESOURCE_ID_DAY_CLEAR,
+    RESOURCE_ID_DAY_PARTYCLOUD,
+  RESOURCE_ID_DAY_CLOUDY,
+  RESOURCE_ID_DAY_RAIN,
+  RESOURCE_ID_DAY_LIGHTNING,
+  RESOURCE_ID_DAY_SNOW,
+};
+const int night_codes[WEATHERLEN] = {
+  RESOURCE_ID_NIGHT_CLEAR,
+    RESOURCE_ID_NIGHT_PARTYCLOUD,
+  RESOURCE_ID_NIGHT_CLOUDY,
+  RESOURCE_ID_NIGHT_RAIN,
+  RESOURCE_ID_NIGHT_LIGHTNING,
+  RESOURCE_ID_NIGHT_SNOW,
+};
+
 static GBitmap* s_bitmap_battery[BATTERYLEN];
 static GBitmap* s_bitmap_weather[WEATHERLEN];
 static int s_steps = 0;
@@ -51,6 +92,27 @@ static void update_weather() {
   app_message_outbox_send();
 
 }
+static void prv_update_display() {
+  update_weather();  
+}
+void grab_clock(int i) {
+  gbitmap_destroy(s_bitmap_day);
+  int imageindex = day?DEFAULT_DAY:DEFAULT_NIGHT;
+  if(settings.weatherScreens) {
+    imageindex = settings.weatherScreens;
+  }
+  else if(settings.forceWeather > -1) {
+    imageindex = settings.forceWeather;
+  }
+  if(day) {
+    s_bitmap_day = gbitmap_create_with_resource(day_codes[imageindex]);
+  }
+  else {
+    s_bitmap_day = gbitmap_create_with_resource(night_codes[imageindex]);
+
+  }
+}
+
 static void update_battery() {
   static char buffer[5];
   snprintf(buffer, 5, "%d%%",s_battery_level);
@@ -137,17 +199,17 @@ static void update_time() {
   text_layer_set_text(s_time_text_layer, s_time_buffer);
   if(tick_time->tm_hour > 19 || tick_time->tm_hour < 6) {
     if(day) {
-      bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_night);
-      text_layer_set_text_color(s_time_text_layer, GColorWhite);
       day = false;
+      grab_clock(lastWeather);
+      text_layer_set_text_color(s_time_text_layer, GColorWhite);
     }
   }
   else {
     if(!day) {
-      bitmap_layer_set_bitmap(s_backdrop_layer, s_bitmap_day);
+      day = true;
+      grab_clock(lastWeather);
       text_layer_set_text_color(s_time_text_layer, GColorBlack);
 
-      day = true;
     }
 
   }
@@ -271,19 +333,48 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     static char weather_layer_buffer[42];
     static int weathercode = 0;
     weathercode = (int)condint_tuple->value->int32;
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", (int)(temp_tuple->value->int32 * 1.8 + 32));
+    if(settings.Celsius) {
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°C", (int)(temp_tuple->value->int32));
+    }
+    else {
+      snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", (int)(temp_tuple->value->int32 * 1.8 + 32));
+    }
     snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", conditions_tuple->value->cstring);
     snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", temperature_buffer, conditions_buffer);
     text_layer_set_text(s_weather_text_layer, weather_layer_buffer);
-    if (weathercode == 0) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[0]);
-    else if (weathercode <= 48) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[2]);
-    else if (weathercode <= 67) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[3]);
-    else if (weathercode <= 77) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[5]);
-    else if (weathercode <= 82) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[3]);
-    else if (weathercode <= 86) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[5]);
-    else if (weathercode == 95) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[4]);
-    else if (weathercode <= 99) bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[4]);
+    if (weathercode == 0) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[0]); grab_clock(0); lastWeather=0;}
+    else if (weathercode <= 48) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[2]);grab_clock(2); lastWeather=2;}
+    else if (weathercode <= 67) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[3]);grab_clock(3); lastWeather=3;}
+    else if (weathercode <= 77) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[5]);grab_clock(5); lastWeather=5;}
+    else if (weathercode <= 82) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[3]);grab_clock(3); lastWeather=3;}
+    else if (weathercode <= 86) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[5]);grab_clock(5); lastWeather=5;}
+    else if (weathercode == 95) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[4]);grab_clock(4); lastWeather=4;}
+    else if (weathercode <= 99) {bitmap_layer_set_bitmap(s_weather_icon_layer, s_bitmap_weather[4]);grab_clock(4); lastWeather=4;}
   }
+  Tuple *showcelsius_t = dict_find(iterator, MESSAGE_KEY_CELSIUS);
+  if (showcelsius_t) {
+    settings.Celsius = showcelsius_t->value->int32 == 1;
+  }
+
+  Tuple *dynamicimage_t = dict_find(iterator, MESSAGE_KEY_DYNAMICIMAGE);
+  if (dynamicimage_t) {
+    settings.weatherScreens = dynamicimage_t->value->int32 == 1;
+  }
+  Tuple *forceseason_t = dict_find(iterator, MESSAGE_KEY_FORCESEASON);
+  if (forceseason_t) { //yeah i know this is gross, but im lazy and this was easy enough
+    if(forceseason_t->value->cstring[0] == '-') settings.forceWeather = -1;
+    if(forceseason_t->value->cstring[0] == '0') settings.forceWeather = 0;
+    if(forceseason_t->value->cstring[0] == '1') settings.forceWeather = 1;
+    if(forceseason_t->value->cstring[0] == '2') settings.forceWeather = 2;
+    if(forceseason_t->value->cstring[0] == '3') settings.forceWeather = 3;
+    if(forceseason_t->value->cstring[0] == '4') settings.forceWeather = 4;
+    if(forceseason_t->value->cstring[0] == '5') settings.forceWeather = 5;
+  }
+  // Save and apply if any settings were changed
+  if (showcelsius_t || dynamicimage_t || forceseason_t) {
+    prv_save_settings();
+    prv_update_display();
+}
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -299,6 +390,7 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 }
 
 static void init() {
+  prv_load_settings();
   s_main_window = window_create();
   window_set_background_color(s_main_window, GColorBlack);
 
@@ -307,8 +399,7 @@ static void init() {
     .load = main_window_load,
     .unload = main_window_unload
   });
-  s_bitmap_day = gbitmap_create_with_resource(RESOURCE_ID_DAY);
-  s_bitmap_night = gbitmap_create_with_resource(RESOURCE_ID_NIGHT);
+  s_bitmap_day = gbitmap_create_with_resource(DEFAULT_DAY);
 
     //initialize backdrop
 
@@ -328,8 +419,8 @@ static void init() {
   app_message_register_outbox_sent(outbox_sent_callback);
 
   // Open AppMessage
-  const int inbox_size = 128;
-  const int outbox_size = 128;
+  const int inbox_size = 256;
+  const int outbox_size = 256;
   app_message_open(inbox_size, outbox_size);
   // Show the Window on the watch, with animated=true
   window_stack_push(s_main_window, true);
