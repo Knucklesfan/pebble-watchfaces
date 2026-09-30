@@ -195,7 +195,8 @@ static void update_time() {
   // Display the date
   text_layer_set_text(s_date_layer, s_date_buffer);
   static char s_time_buffer[8];
-  strftime(s_time_buffer, sizeof(s_time_buffer), "%I:%M", tick_time);
+  strftime(s_time_buffer, sizeof(s_time_buffer), clock_is_24h_style() ?
+                                                    "%H:%M" : "%I:%M", tick_time);
   text_layer_set_text(s_time_text_layer, s_time_buffer);
   if(tick_time->tm_hour > 19 || tick_time->tm_hour < 6) {
     if(day) {
@@ -308,7 +309,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_date_layer));
   text_layer_set_text(s_date_layer, "Mon Jan 01");
   s_time_text_layer = text_layer_create(
-    GRect(0, 32, 200, 48)); 
+    GRect(0, 32, 200, 50)); 
   text_layer_set_background_color(s_time_text_layer, GColorClear);
   text_layer_set_text_color(s_time_text_layer, GColorBlack);
   text_layer_set_font(s_time_text_layer, fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49));
